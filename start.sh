@@ -44,14 +44,16 @@ killall jackd -9 &> /dev/null
 echo "killall commander.sh"
 killall commander.sh -9 &> /dev/null
 
-echo "killall octave-cli"
-killall octave-cli -9 &> /dev/null
+echo "killall python (HHYL2H)"
+killall python3.5
 
-echo "killall tcpserver"
-killall tcpserver -9 &> /dev/null
-
+#echo "killall octave-cli"
+#killall octave-cli -9 &> /dev/null
 
 sleep 1
+
+echo "reload alsa settings from file"
+alsactl --file ~/hearingaid-prototype/asound.state restore
 
 echo "start jackd"
 taskset -c 1 jackd --realtime -d alsa -d hw:$SOUNDDEVICE,$SOUNDSTREAM -p $FRAGSIZE -r $SAMPLERATE -n $NPERIODS -s 2>&1 | sed 's/^/[JACKD] /' &
@@ -62,13 +64,13 @@ echo "start threshold noise"
 (cd tools/signals && taskset -c 2 ./thresholdnoise) | sed 's/^/[THRESHOLDNOISE] /' &
 
 echo "start mha"
-taskset -c 3 mha --interface=$MHAIP --port=$MHAPORT "?read:${MHACONFIG}" 2>&1 | sed 's/^/[MHA] /' &
+taskset -c 3 mha --interface=0.0.0.0 --port=$MHAPORT "?read:${MHACONFIG}" 2>&1 | sed 's/^/[MHA] /' &
 
 echo "start commander"
 [ -e "commandqueue" ] || mkfifo commandqueue
 ./commander.sh | sed 's/^/[COMMANDER] /' &
 
-sleep 1
+sleep 5
 
 echo "connect mha"
 jack_connect MHA:out_1 system:playback_2
@@ -77,7 +79,5 @@ jack_connect MHA:out_2 system:playback_1
 echo "initial commands"
 echo feedback 3 > commandqueue
 
-echo "start network command server"
-tcpserver -H -R 0.0.0.0 33338 ./netcommand.sh | sed 's/^/[NETCMD] /' &
-
-(cd tools && octave-cli --eval "userinterface")
+#(cd tools && octave-cli --eval "userinterface") # Octave not needed right now
+(cd ../HHYL2H/LikeToHearController && python3.5 liketohear_main.py &)

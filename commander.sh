@@ -93,11 +93,15 @@ live() {
 
 record() {
   local DURATION=$1
-  local TARGETFILE="${HOME}/recordings/"$(date --iso-8601=seconds)".wav"
-  mhacontrol "mha.transducers.mhachain.record.record = yes"
+  local TARGETFILE="/recordings/in_"$(date --iso-8601=seconds)".wav"
+  local TARGETFILE_OUT="/recordings/out_"$(date --iso-8601=seconds)".wav"
+  mhacontrol "mha.in.record = yes"
+  mhacontrol "mha.out.record = yes"
   sleep "$DURATION"
-  mhacontrol "mha.transducers.mhachain.record.record = no"
-  cp "/dev/shm/recording.wav" "$TARGETFILE"
+  mhacontrol "mha.in.record = no"
+  mhacontrol "mha.out.record = no"
+  cp "/dev/shm/record_in.wav" "$TARGETFILE"
+  cp "/dev/shm/record_out.wav" "$TARGETFILE_OUT"
 }
 
 while true ; do
@@ -133,3 +137,4 @@ while true ; do
     esac
   done < commandqueue
 done
+
