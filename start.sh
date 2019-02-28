@@ -47,9 +47,6 @@ killall commander.sh -9 &> /dev/null
 echo "killall python (HHYL2H)"
 killall python3.5
 
-#echo "killall octave-cli"
-#killall octave-cli -9 &> /dev/null
-
 sleep 1
 
 echo "reload alsa settings from file"
@@ -79,5 +76,4 @@ jack_connect MHA:out_2 system:playback_1
 echo "initial commands"
 echo feedback 3 > commandqueue
 
-#(cd tools && octave-cli --eval "userinterface") # Octave not needed right now
 (cd ../HHYL2H/LikeToHearController && python3.5 liketohear_main.py &)
