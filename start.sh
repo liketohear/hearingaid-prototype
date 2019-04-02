@@ -76,4 +76,4 @@ jack_connect MHA:out_2 system:playback_1
 echo "initial commands"
 echo feedback 3 > commandqueue
 
-(cd ../HHYL2H/LikeToHearController && python3.5 liketohear_main.py &)
+(cd ../liketohear/LikeToHearController && python3.5 liketohear_main.py &)
