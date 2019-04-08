@@ -1,19 +1,11 @@
 #!/usr/bin/python3
-# -*- utf-8 -*-
 
-##@package websocket.py
 #
-# Control Class for the openMHA TCP/IP Interface
+# Calibration Meter using the openMHA TCP/IP Interface
 #
 # @author Tobias Bruns
 # @version 0.1
 # @date 03.04.2019
-
-# 2014 Fraunhofer IDMT, Oldenburg
-# This software and/or program is protected by copyright law and international
-# treaties. Any reproduction or distribution of this software and/or program,
-# or any portion of it, may result in severe civil and criminal penalties, and
-# will be prosecuted to the maximum extent possible under law.
 
 
 import socket, time
@@ -22,14 +14,9 @@ import socket, time
 
 
 class OpenMhaCalibration(object):
-    '''
-    classdocs
-    '''
+
     _openMhaAddr = "127.0.0.1"; #standard address
     _openMhaPort = 33337; #standard port
-    _openMhaGainPresets = {};
-    _normalUCL = 85; # normal value for loud voice
-    _normalMCL = 65; # normal vlaue for loud voice
     _debug = True;
     
     def __init__(self):
@@ -43,7 +30,7 @@ class OpenMhaCalibration(object):
 
         
     def close(self):
-        self.setLog = False
+        self._conn.close()
     
         
     def ShowCalibrationLevels(self,dur_sec=30):
@@ -54,10 +41,12 @@ class OpenMhaCalibration(object):
             self._conn.send(msg.encode('utf-8'))
             print(self._conn.recv(1024).decode('utf-8'))
             time.sleep(1/time_intervall)
+
+        self.close()
         
             
     
 if __name__ == "__main__":
 
     openMHACalibration = OpenMhaCalibration();
-    openMHACalibration.ShowCalibrationLevels(60);
+    openMHACalibration.ShowCalibrationLevels(4);
