@@ -55,19 +55,21 @@ alsactl --file ~/hearingaid-prototype/asound.state restore
 echo "start jackd"
 taskset -c 1 jackd --realtime -d alsa -d hw:$SOUNDDEVICE,$SOUNDSTREAM -p $FRAGSIZE -r $SAMPLERATE -n $NPERIODS -s 2>&1 | sed 's/^/[JACKD] /' &
 
-sleep 2
+sleep 5
 
 echo "start threshold noise"
 (cd tools/signals && taskset -c 2 ./thresholdnoise) | sed 's/^/[THRESHOLDNOISE] /' &
 
+sleep 2
+
 echo "start mha"
 taskset -c 3 mha --interface=0.0.0.0 --port=$MHAPORT "?read:${MHACONFIG}" 2>&1 | sed 's/^/[MHA] /' &
+
+sleep 2
 
 echo "start commander"
 [ -e "commandqueue" ] || mkfifo commandqueue
 ./commander.sh | sed 's/^/[COMMANDER] /' &
-
-sleep 5
 
 echo "connect mha"
 jack_connect MHA:out_1 system:playback_2
@@ -75,5 +77,7 @@ jack_connect MHA:out_2 system:playback_1
 
 echo "initial commands"
 echo feedback 3 > commandqueue
+
+sleep 6
 
 (cd ../liketohear/LikeToHearController && python3.5 liketohear_main.py &)
